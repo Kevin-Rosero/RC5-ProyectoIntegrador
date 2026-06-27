@@ -5,6 +5,8 @@ public class Adoptante extends Persona{
     public Adoptante(String nombre, String cedula, int edad) {
         super(nombre, cedula, edad);
     }
+    private String direccion;
+    private String telefono;
 
     @Override
     public boolean validarDatos() {

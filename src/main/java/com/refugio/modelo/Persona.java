@@ -4,6 +4,10 @@ public abstract class Persona {
     private String nombre;
     private String cedula;
     private int edad;
+    private String correo;
+    private String password;
+
+
 
     public Persona(String nombre, String cedula, int edad) {
         this.nombre = nombre;

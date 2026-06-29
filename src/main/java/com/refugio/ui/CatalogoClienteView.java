@@ -1,62 +1,41 @@
 package com.refugio.ui;
 
-import com.refugio.archivos.GestorArchivosTxt;
 import com.refugio.modelo.Mascota;
-import com.vaadin.flow.component.Text;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.refugio.servicios.MascotaService;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.router.BeforeEnterObserver;
-import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.refugio.servicios.UsuarioSesion;
+import com.vaadin.flow.component.html.H1;
+import jakarta.annotation.PostConstruct;
 
-import java.util.List;
+@Route("catalogo") // Esta es la ruta: tuapp.com/catalogo
+public class CatalogoClienteView extends VerticalLayout {
 
-@Route("catalogo-cliente")
-@PageTitle("Catálogo de mascotas")
-public class CatalogoClienteView extends VerticalLayout implements BeforeEnterObserver {
-
-    private final GestorArchivosTxt gestorArchivosTxt = new GestorArchivosTxt();
+    private MascotaService mascotaService = new MascotaService();
+    private FlexLayout contenedorTarjetas = new FlexLayout();
 
     public CatalogoClienteView() {
-        addClassName("catalogo-cliente-view");
+        // Configuración de estilo global (Blanco hueso)
+        getStyle().set("background-color", "#F8F9F4");
+        getStyle().set("padding", "20px");
         setSizeFull();
-        setPadding(false);
-        setSpacing(true);
-        setMargin(false);
-        setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.STRETCH);
 
-        H2 titulo = new H2("Catálogo de mascotas");
-        Span subtitulo = new Span("Explora las mascotas registradas y revisa su estado actual.");
+        add(new H1("Nuestros amigos disponibles"));
 
-        Div grid = new Div();
-        grid.addClassName("catalogo-cliente-grid");
+        // Configuramos el contenedor para que las tarjetas se acomoden solas
+        contenedorTarjetas.setFlexWrap(FlexLayout.FlexWrap.WRAP);
+        contenedorTarjetas.setWidthFull();
 
-        List<Mascota> mascotas = gestorArchivosTxt.leerMascotas();
-        if (mascotas.isEmpty()) {
-            Div vacio = new Div(new Text("No hay mascotas registradas para mostrar."));
-            vacio.getStyle()
-                    .set("background-color", "#FFFFFF")
-                    .set("border-radius", "18px")
-                    .set("padding", "1rem")
-                    .set("box-shadow", "0 6px 18px rgba(0, 0, 0, 0.08)");
-            grid.add(vacio);
-        } else {
-            mascotas.forEach(mascota -> grid.add(new TarjetaMascota(mascota)));
-        }
-
-        add(titulo, subtitulo, grid);
-        expand(grid);
+        add(contenedorTarjetas);
+        cargarMascotas();
     }
 
-    @Override
-    public void beforeEnter(BeforeEnterEvent event) {
-        if (!UsuarioSesion.esAdoptante()) {
-            event.rerouteTo(LoginView.class);
+    private void cargarMascotas() {
+        // Obtenemos la lista desde el servicio
+        for (Mascota m : mascotaService.obtenerMascotasDisponibles()) {
+            // Aquí llamarás a tu clase TarjetaMascota
+            TarjetaMascota tarjeta = new TarjetaMascota(m);
+            contenedorTarjetas.add(tarjeta);
         }
     }
 }

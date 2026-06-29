@@ -10,8 +10,16 @@ A Spring Boot + Vaadin project. Build your UI in pure Java — no HTML, no JavaS
 
 From the project folder:
 
+```powershell
+.\mvnw.cmd spring-boot:run
+```
+
+> **Requisito:** usa **JDK 17 o superior**. Si tu terminal sigue fallando, revisa `java -version` y `JAVA_HOME` antes de arrancar.
+
+Si prefieres usar Git Bash o WSL, también funciona:
+
 ```bash
-./mvnw spring-boot:run        # Windows: mvnw.cmd spring-boot:run
+./mvnw spring-boot:run
 ```
 
 Then open **http://localhost:8080**.

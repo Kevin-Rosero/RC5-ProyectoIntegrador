@@ -1,15 +1,22 @@
 package com.refugio.servicios;
 
-import com.refugio.archivos.GestorArchivosTxt;
 import com.refugio.modelo.Admin;
 import com.refugio.modelo.Adoptante;
 import com.refugio.modelo.Persona;
+import com.refugio.repositorios.AdminRepository;
+import com.refugio.repositorios.AdoptanteRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import java.util.Optional;
 
-import java.util.List;
-
+@Service
 public class AuthenticationService {
 
-    private GestorArchivosTxt gestor = new GestorArchivosTxt();
+    @Autowired
+    private AdminRepository adminRepository;
+    
+    @Autowired
+    private AdoptanteRepository adoptanteRepository;
 
     /**
      * Valida las credenciales de un usuario.
@@ -18,24 +25,25 @@ public class AuthenticationService {
      */
     public Persona autenticar(String correo, String password) {
 
-        // Buscar en el archivo de Administradores
-        List<Admin> administradores = gestor.leerAdmins();
-        for (Admin admin : administradores) {
-            // Comparamos el correo (ignorando mayúsculas/minúsculas) y el password (exacto)
-            if (admin.getCorreo().equalsIgnoreCase(correo) && admin.getPassword().equals(password)) {
+        // Buscar en la colección de Administradores
+        Optional<Admin> adminOpt = adminRepository.findByCorreo(correo);
+        if (adminOpt.isPresent()) {
+            Admin admin = adminOpt.get();
+            if (admin.getPassword().equals(password)) {
                 return admin; // Encontramos al admin, lo devolvemos y terminamos la búsqueda.
             }
         }
 
-        // Si no era administrador, buscar en el archivo de Adoptantes
-        List<Adoptante> adoptantes = gestor.leerAdoptantes();
-        for (Adoptante adoptante : adoptantes) {
-            if (adoptante.getCorreo().equalsIgnoreCase(correo) && adoptante.getPassword().equals(password)) {
-                return adoptante; // Encontramos al cliente, lo devolvemos y terminamos.
+        // Si no era administrador, buscar en la colección de Adoptantes
+        Optional<Adoptante> adoptanteOpt = adoptanteRepository.findByCorreo(correo);
+        if (adoptanteOpt.isPresent()) {
+            Adoptante adoptante = adoptanteOpt.get();
+            if (adoptante.getPassword().equals(password)) {
+                return adoptante; // Encontramos al adoptante, lo devolvemos y terminamos.
             }
         }
 
-        // Si terminó de buscar en ambos archivos y no encontró coincidencias
+        // Si terminó de buscar en ambas colecciones y no encontró coincidencias
         return null;
     }
 }

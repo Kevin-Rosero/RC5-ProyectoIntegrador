@@ -1,90 +1,82 @@
 package com.refugio.servicios;
 
-import com.refugio.archivos.GestorArchivosTxt;
 import com.refugio.modelo.Mascota;
+import com.refugio.repositorios.MascotaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class MascotaService {
-    private GestorArchivosTxt gestor = new GestorArchivosTxt();
+    @Autowired
+    private MascotaRepository mascotaRepository;
 
     // Obtener solo las disponibles
     public List<Mascota> obtenerMascotasDisponibles() {
-        return gestor.leerMascotas().stream()
+        return mascotaRepository.findByEstado("DISPONIBLE").stream()
                 .filter(Mascota::estaDisponible)
                 .collect(Collectors.toList());
     }
 
     // Buscar mascota por Nombre (Ya que no tenemos ID en el modelo actual)
     public Mascota buscarPorNombre(String nombre) {
-        return gestor.leerMascotas()
-                .stream()
-                .filter(m -> m.getNombre().equalsIgnoreCase(nombre))
-                .findFirst()
-                .orElse(null);
+        return mascotaRepository.findByNombre(nombre).orElse(null);
     }
 
     // Agregar una nueva mascota
     public void agregarMascota(Mascota mascota) {
-        gestor.guardarMascota(mascota);
+        mascotaRepository.save(mascota);
     }
 
     // Actualizar una mascota existente
     public boolean actualizarMascota(Mascota mascotaActualizada) {
-        List<Mascota> mascotas = gestor.leerMascotas();
-
-        for (int i = 0; i < mascotas.size(); i++) {
-            if (mascotas.get(i).getNombre().equalsIgnoreCase(mascotaActualizada.getNombre())) {
-                mascotas.set(i, mascotaActualizada);
-                // Aquí usamos un NUEVO método del gestor para sobrescribir todo el archivo
-                gestor.sobrescribirMascotas(mascotas);
-                return true;
-            }
+        Mascota mascota = mascotaRepository.findByNombre(mascotaActualizada.getNombre()).orElse(null);
+        
+        if (mascota != null) {
+            // Actualizar todos los campos
+            mascota.setEspecie(mascotaActualizada.getEspecie());
+            mascota.setNombre(mascotaActualizada.getNombre());
+            mascota.setSexo(mascotaActualizada.getSexo());
+            mascota.setEdad(mascotaActualizada.getEdad());
+            mascota.setEstadoSalud(mascotaActualizada.getEstadoSalud());
+            mascota.actualizarEstado(mascotaActualizada.getEstado());
+            mascotaRepository.save(mascota);
+            return true;
         }
         return false;
     }
 
     // Eliminar mascota por Nombre
     public boolean eliminarMascota(String nombre) {
-        List<Mascota> mascotas = gestor.leerMascotas();
-
-        // removeIf devuelve true si encontró y eliminó a la mascota
-        boolean eliminada = mascotas.removeIf(m -> m.getNombre().equalsIgnoreCase(nombre));
-
-        if (eliminada) {
-            gestor.sobrescribirMascotas(mascotas);
+        Mascota mascota = mascotaRepository.findByNombre(nombre).orElse(null);
+        
+        if (mascota != null) {
+            mascotaRepository.delete(mascota);
+            return true;
         }
-        return eliminada;
+        return false;
     }
 
     // Cambiar disponibilidad (Ej: cuando es adoptada o entra en tratamiento)
     public boolean cambiarDisponibilidad(String nombre, String nuevoEstado) {
-        List<Mascota> mascotas = gestor.leerMascotas();
-
-        for (Mascota m : mascotas) {
-            if (m.getNombre().equalsIgnoreCase(nombre)) {
-                // Usamos el método oficial del modelo
-                m.actualizarEstado(nuevoEstado);
-                gestor.sobrescribirMascotas(mascotas);
-                return true;
-            }
+        Mascota mascota = mascotaRepository.findByNombre(nombre).orElse(null);
+        
+        if (mascota != null) {
+            mascota.actualizarEstado(nuevoEstado);
+            mascotaRepository.save(mascota);
+            return true;
         }
         return false;
     }
 
     // Buscar por especie
     public List<Mascota> buscarPorEspecie(String especie) {
-        return gestor.leerMascotas()
-                .stream()
-                .filter(m -> m.getEspecie().equalsIgnoreCase(especie))
-                .collect(Collectors.toList());
+        return mascotaRepository.findByEspecie(especie);
     }
 
     // Buscar por edad máxima
     public List<Mascota> buscarPorEdadMaxima(int edad) {
-        return gestor.leerMascotas()
-                .stream()
-                .filter(m -> m.getEdad() <= edad)
-                .collect(Collectors.toList());
+        return mascotaRepository.findByEdadLessThanEqual(edad);
     }
 }

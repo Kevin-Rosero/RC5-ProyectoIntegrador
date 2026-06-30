@@ -1,7 +1,13 @@
 package com.refugio.modelo;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document(collection = "evaluaciones")
 public class Evaluacion {
 
+    @Id
+    private String id;
 
     private String tipoMascotaDeseada;
     private String motivoAdopcion; // Respuesta abierta
@@ -57,6 +63,14 @@ public class Evaluacion {
     }
 
     // --- LÓGICA DE NEGOCIO (Motor de evaluación) ---
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public void calcularPuntaje() {
         int puntos = 0;

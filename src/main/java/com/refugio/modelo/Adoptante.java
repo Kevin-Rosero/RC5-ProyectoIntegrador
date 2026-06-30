@@ -1,5 +1,8 @@
 package com.refugio.modelo;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document(collection = "adoptantes")
 public class Adoptante extends Persona {
 
     // 1. Atributos específicos del adoptante siempre al inicio

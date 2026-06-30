@@ -1,10 +1,14 @@
 package com.refugio.modelo;
 
 import java.time.LocalDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+@Document(collection = "solicitudes_adopcion")
 public class SolicitudAdopcion {
 
     // 1. Atributos
+    @Id
     private String idSolicitud; // Ej: "SOL-001"
     private Adoptante adoptante; // El cliente que hace la solicitud
     private Mascota mascota; // El perrito o gatito deseado

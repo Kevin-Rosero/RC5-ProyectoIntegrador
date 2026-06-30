@@ -1,7 +1,13 @@
 package com.refugio.modelo;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document(collection = "mascotas")
 public class Mascota {
 
+    @Id
+    private String id;
     private String especie;
     private String nombre;
     private String sexo;
@@ -21,6 +27,13 @@ public class Mascota {
         this.estado = "DISPONIBLE";
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getEspecie() {
         return especie;

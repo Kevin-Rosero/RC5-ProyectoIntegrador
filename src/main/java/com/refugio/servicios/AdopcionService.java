@@ -1,18 +1,24 @@
 package com.refugio.servicios;
 
-import com.refugio.archivos.GestorArchivosTxt;
 import com.refugio.modelo.Adoptante;
 import com.refugio.modelo.Evaluacion;
 import com.refugio.modelo.Mascota;
 import com.refugio.modelo.SolicitudAdopcion;
-
+import com.refugio.repositorios.MascotaRepository;
+import com.refugio.repositorios.SolicitudAdopcionRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class AdopcionService {
 
-    private GestorArchivosTxt gestor = new GestorArchivosTxt();
-    private MascotaService mascotaService = new MascotaService();
+    @Autowired
+    private SolicitudAdopcionRepository solicitudAdopcionRepository;
+    
+    @Autowired
+    private MascotaService mascotaService;
 
     /**
      * MÉTODO PARA EL CLIENTE (ADOPTANTE)
@@ -35,8 +41,8 @@ public class AdopcionService {
         String idGenerado = "SOL-" + System.currentTimeMillis();
         SolicitudAdopcion nuevaSolicitud = new SolicitudAdopcion(idGenerado, adoptante, mascota, evaluacion);
 
-        // 4. Guardar en el archivo txt (¡Ya no está comentado!)
-        gestor.guardarSolicitud(nuevaSolicitud);
+        // 4. Guardar en la base de datos MongoDB
+        solicitudAdopcionRepository.save(nuevaSolicitud);
 
         return true; // Solicitud procesada con éxito
     }
@@ -46,8 +52,7 @@ public class AdopcionService {
      * Obtiene solo las solicitudes que requieren revisión humana.
      */
     public List<SolicitudAdopcion> obtenerSolicitudesPendientes() {
-        return gestor.leerSolicitudes().stream()
-                .filter(s -> s.getEstadoTramite().equals("PENDIENTE"))
+        return solicitudAdopcionRepository.findByEstadoTramite("PENDIENTE").stream()
                 .collect(Collectors.toList());
     }
 
@@ -57,27 +62,24 @@ public class AdopcionService {
      */
     // Corregimos el parámetro a String idSolicitud
     public boolean emitirVeredictoFinal(String idSolicitud, String decisionAdmin) {
-        List<SolicitudAdopcion> todasLasSolicitudes = gestor.leerSolicitudes();
+        java.util.Optional<SolicitudAdopcion> solicitudOpt = solicitudAdopcionRepository.findById(idSolicitud);
+        
+        if (solicitudOpt.isPresent()) {
+            SolicitudAdopcion solicitud = solicitudOpt.get();
 
-        for (SolicitudAdopcion solicitud : todasLasSolicitudes) {
+            // El administrador toma la decisión final (APROBADA o RECHAZADA)
+            solicitud.setEstadoTramite(decisionAdmin);
 
-            // Corregimos la comparación usando .equals()
-            if (solicitud.getIdSolicitud().equals(idSolicitud)) {
-
-                // El administrador toma la decisión final (APROBADA o RECHAZADA)
-                solicitud.setEstadoTramite(decisionAdmin);
-
-                // Si el administrador aprueba, debemos sacar a la mascota del catálogo
-                if (decisionAdmin.equals("APROBADA")) {
-                    String nombreMascota = solicitud.getMascota().getNombre();
-                    // Usamos el MascotaService para aplicar la regla de negocio correctamente
-                    mascotaService.cambiarDisponibilidad(nombreMascota, "ADOPTADA");
-                }
-
-                // Corregimos el error de tipeo y llamamos al método correcto del gestor
-                gestor.sobrescribirSolicitudes(todasLasSolicitudes);
-                return true;
+            // Si el administrador aprueba, debemos sacar a la mascota del catálogo
+            if (decisionAdmin.equals("APROBADA")) {
+                String nombreMascota = solicitud.getMascota().getNombre();
+                // Usamos el MascotaService para aplicar la regla de negocio correctamente
+                mascotaService.cambiarDisponibilidad(nombreMascota, "ADOPTADA");
             }
+
+            // Guardar los cambios en la base de datos
+            solicitudAdopcionRepository.save(solicitud);
+            return true;
         }
         return false;
     }

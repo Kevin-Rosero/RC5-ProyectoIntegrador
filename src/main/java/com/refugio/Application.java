@@ -6,9 +6,12 @@ import com.vaadin.flow.component.dependency.StyleSheet;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = {
+        org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration.class
+})
 @StyleSheet("/styles.css")
 @PWA(name = "Sistema Refugio Mascotas", shortName = "Refugio")
+
 public class Application implements AppShellConfigurator {
 
     public static void main(String[] args) {

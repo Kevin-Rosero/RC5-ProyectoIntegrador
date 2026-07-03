@@ -214,7 +214,20 @@ public class LoginView extends VerticalLayout {
     }
 
     private boolean esAdministradorValido(String usuario, String contrasena) {
-        return usuario.equals("admin") && contrasena.equals("123");
+        // Admin 1 (El por defecto)
+        boolean esAdmin1 = usuario.equals("admin") && contrasena.equals("123");
+
+        // Admin 2
+        boolean esAdmin2 = usuario.equals("kevinrosero") && contrasena.equals("floof2026");
+
+        // Admin 3
+        boolean esAdmin3 = usuario.equals("joseserrano") && contrasena.equals("floof2026");
+
+        // Admin 4
+        boolean esAdmin4 = usuario.equals("andresmorales") && contrasena.equals("floof2026");
+
+        // Si coincide con CUALQUIERA de los tres, devuelve true y lo deja pasar
+        return esAdmin1 || esAdmin2 || esAdmin3 || esAdmin4;
     }
 
     private void mostrarError(String mensaje) {

@@ -9,6 +9,10 @@ public class Adoptante extends Persona {
     private String direccion;
     private String telefono;
 
+    // Constructor vacío requerido por Spring Data MongoDB
+    public Adoptante() {
+    }
+
     public Adoptante(String nombre, String cedula, int edad, String correo, String password, String direccion, String telefono) {
         super(nombre, cedula, edad, correo, password);
 

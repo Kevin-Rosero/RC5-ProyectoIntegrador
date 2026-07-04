@@ -13,6 +13,10 @@ public abstract class Persona {
     private String correo;
     private String password;
 
+    // Constructor vacío requerido por Spring Data MongoDB
+    public Persona() {
+    }
+
     // 1. Constructor actualizado para recibir las credenciales
     public Persona(String nombre, String cedula, int edad, String correo, String password) {
         this.nombre = nombre;

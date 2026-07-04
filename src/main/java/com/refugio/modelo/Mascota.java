@@ -17,6 +17,9 @@ public class Mascota {
     private String estadoSalud;
     private String estado;
 
+    // Constructor vacío requerido por Spring Data MongoDB
+    public Mascota() {
+    }
 
     public Mascota(String especie, String nombre, String sexo, int edad, String estadoSalud) {
         this.especie = especie;

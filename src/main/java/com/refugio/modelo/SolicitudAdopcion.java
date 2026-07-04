@@ -17,6 +17,10 @@ public class SolicitudAdopcion {
     private String estadoTramite; // "PENDIENTE", "APROBADA", "RECHAZADA"
     private String fechaCreacion; // Día en el que se llenó el formulario
 
+    // Constructor vacío requerido por Spring Data MongoDB
+    public SolicitudAdopcion() {
+    }
+
     // 2. Constructor
     public SolicitudAdopcion(String idSolicitud, Adoptante adoptante, Mascota mascota, Evaluacion evaluacion) {
         this.idSolicitud = idSolicitud;

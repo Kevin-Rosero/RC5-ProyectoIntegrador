@@ -10,6 +10,9 @@ public class Admin extends Persona {
     private String cargo;
     private boolean permisosTotales;
 
+    // Constructor vacío requerido por Spring Data MongoDB
+    public Admin() {
+    }
 
     public Admin(String nombre, String cedula, int edad, String correo, String password, String idEmpleado, String cargo, boolean permisosTotales) {
 

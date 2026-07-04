@@ -31,6 +31,9 @@ public class Evaluacion {
     private int puntajeTotal;
     private String resultado; // PENDIENTE, APROBADA, RECHAZADA
 
+    // Constructor vacío requerido por Spring Data MongoDB
+    public Evaluacion() {
+    }
 
     public Evaluacion(String tipoMascotaDeseada, String motivoAdopcion, String tipoVivienda,
                       String cantidadPersonasHogar, String acuerdoFamiliar, String tiempoSola,

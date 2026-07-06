@@ -43,7 +43,9 @@ public class MainLayout extends AppLayout {
         toggle.setAriaLabel("Menu toggle");
         toggle.getStyle().set("color", "#FFFFFF");
 
-        H1 titulo = new H1("Floof - Panel de Administración");
+        H1 titulo = new H1(UsuarioSesion.esAdmin()
+                ? "Floof - Panel de Administración"
+                : "Adopta amor, cambia una vida.");
         titulo.getStyle().set("margin", "0");
         titulo.getStyle().set("color", "#FFFFFF");
         titulo.addClassNames(LumoUtility.FontSize.LARGE);

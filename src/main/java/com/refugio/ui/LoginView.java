@@ -2,9 +2,7 @@ package com.refugio.ui;
 
 import com.refugio.modelo.Admin;
 import com.refugio.modelo.Adoptante;
-import com.refugio.modelo.Persona;
 import com.refugio.repositorios.AdoptanteRepository;
-import com.refugio.servicios.AuthenticationService;
 import com.refugio.servicios.UsuarioSesion;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -26,14 +24,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 @PageTitle("Floof - Iniciar Sesión")
 public class LoginView extends VerticalLayout {
 
-    private final AuthenticationService authenticationService;
     private final AdoptanteRepository adoptanteRepository;
     private final TextField usuario = new TextField();
     private final PasswordField contrasena = new PasswordField();
 
     @Autowired
-    public LoginView(AuthenticationService authenticationService, AdoptanteRepository adoptanteRepository) {
-        this.authenticationService = authenticationService;
+    public LoginView(AdoptanteRepository adoptanteRepository) {
         this.adoptanteRepository = adoptanteRepository;
         
         setWidthFull();
@@ -140,6 +136,15 @@ public class LoginView extends VerticalLayout {
                 .set("font-size", "16px")
                 .set("border-radius", "4px");
 
+        Button btnRegistrarse = new Button("Registrarse", event -> getUI().ifPresent(ui -> ui.navigate(RegistroAdoptanteView.class)));
+        btnRegistrarse.setWidthFull();
+        btnRegistrarse.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        btnRegistrarse.getStyle()
+                .set("margin-top", "8px")
+                .set("background-color", "transparent")
+                .set("color", "#6b8e3d")
+                .set("border", "1px solid #6b8e3d");
+
         // Link olvido contraseña
         Paragraph olvidaste = new Paragraph("¿Olvidaste tu contraseña?");
         olvidaste.getStyle()
@@ -149,7 +154,7 @@ public class LoginView extends VerticalLayout {
                 .set("margin-top", "16px")
                 .set("cursor", "pointer");
 
-        layout.add(encabezado, usuario, contrasena, btnIngresar, olvidaste);
+        layout.add(encabezado, usuario, contrasena, btnIngresar, btnRegistrarse, olvidaste);
         return layout;
     }
 
@@ -181,35 +186,28 @@ public class LoginView extends VerticalLayout {
         // FLUJO 2: Buscar Adoptante en MongoDB
         try {
             var adoptanteOpt = adoptanteRepository.findByCorreo(usuarioIngresado);
-            
+
             if (adoptanteOpt.isPresent()) {
-                // Adoptante existente
                 Adoptante adoptante = adoptanteOpt.get();
-                
-                // Validar contraseña
+
                 if (adoptante.getPassword().equals(contrasenaIngresada)) {
                     Notification notif = Notification.show("¡Bienvenido " + adoptante.getNombre() + "!");
                     notif.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
                     notif.setDuration(2000);
-                    
+
                     UsuarioSesion.guardar(adoptante);
-                    
-                    // Navegar a vista del adoptante (por ahora usa el catálogo)
+
                     getUI().ifPresent(ui -> ui.navigate(CatalogoMascotasView.class));
                 } else {
-                    mostrarError("Contraseña incorrecta");
+                    mostrarError("Error de autenticación: usuario o contraseña incorrectos");
                     contrasena.clear();
                 }
             } else {
-                // Adoptante no registrado - redirigir a registro
-                mostrarNotificacionRegistro();
-                limpiarCampos();
-                
-                // Navegar a vista de registro
-                getUI().ifPresent(ui -> ui.navigate(RegistroAdoptanteView.class));
+                mostrarError("Error de autenticación: usuario o contraseña incorrectos");
+                contrasena.clear();
             }
         } catch (Exception e) {
-            mostrarError("Error al procesar login: " + e.getMessage());
+            mostrarError("Error de autenticación: no se pudo validar el acceso");
         }
     }
 
@@ -236,11 +234,6 @@ public class LoginView extends VerticalLayout {
         notification.setDuration(4000);
     }
 
-    private void mostrarNotificacionRegistro() {
-        Notification notification = Notification.show("Parece que es tu primer acceso. Completa tu registro para continuar.");
-        notification.addThemeVariants(NotificationVariant.LUMO_PRIMARY);
-        notification.setDuration(5000);
-    }
 
     private void limpiarCampos() {
         usuario.clear();

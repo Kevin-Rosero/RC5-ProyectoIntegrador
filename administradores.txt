@@ -1,3 +1,0 @@
-kevinrosero@udla.edu.ec;admin123
-joseserrano@udla.edu.ec;admin456
-andresmorales@udla.edu.ec;admin789

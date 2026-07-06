@@ -138,7 +138,7 @@ public class Evaluacion {
         else if (conoceResponsabilidades.equals("Parcialmente")) puntos += 3;
         else if (conoceResponsabilidades.equals("Muy poco")) puntos += 1;
 
-        this.puntajeTotal = puntos;
+        this.puntajeTotal = Math.max(0, puntos);
     }
 
     public void generarSugerenciaSistema() {
@@ -294,7 +294,7 @@ public class Evaluacion {
     }
 
     public void setPuntajeTotal(int puntajeTotal) {
-        this.puntajeTotal = puntajeTotal;
+        this.puntajeTotal = Math.max(0, puntajeTotal);
     }
 
     public String getResultado() {

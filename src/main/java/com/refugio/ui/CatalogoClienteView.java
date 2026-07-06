@@ -6,15 +6,18 @@ import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.component.html.H1;
-import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Route("catalogo") // Esta es la ruta: tuapp.com/catalogo
 public class CatalogoClienteView extends VerticalLayout {
 
-    private MascotaService mascotaService = new MascotaService();
-    private FlexLayout contenedorTarjetas = new FlexLayout();
+    private final MascotaService mascotaService;
+    private final FlexLayout contenedorTarjetas = new FlexLayout();
 
-    public CatalogoClienteView() {
+    @Autowired
+    public CatalogoClienteView(MascotaService mascotaService) {
+        this.mascotaService = mascotaService;
+
         // Configuración de estilo global (Blanco hueso)
         getStyle().set("background-color", "#F8F9F4");
         getStyle().set("padding", "20px");

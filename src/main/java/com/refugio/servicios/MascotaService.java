@@ -9,8 +9,12 @@ import java.util.stream.Collectors;
 
 @Service
 public class MascotaService {
+    private final MascotaRepository mascotaRepository;
+
     @Autowired
-    private MascotaRepository mascotaRepository;
+    public MascotaService(MascotaRepository mascotaRepository) {
+        this.mascotaRepository = mascotaRepository;
+    }
 
     // Obtener solo las disponibles
     public List<Mascota> obtenerMascotasDisponibles() {
@@ -31,7 +35,15 @@ public class MascotaService {
 
     // Actualizar una mascota existente
     public boolean actualizarMascota(Mascota mascotaActualizada) {
-        Mascota mascota = mascotaRepository.findByNombre(mascotaActualizada.getNombre()).orElse(null);
+        Mascota mascota = null;
+
+        if (mascotaActualizada.getId() != null) {
+            mascota = mascotaRepository.findById(mascotaActualizada.getId()).orElse(null);
+        }
+
+        if (mascota == null && mascotaActualizada.getNombre() != null) {
+            mascota = mascotaRepository.findByNombre(mascotaActualizada.getNombre()).orElse(null);
+        }
         
         if (mascota != null) {
             // Actualizar todos los campos

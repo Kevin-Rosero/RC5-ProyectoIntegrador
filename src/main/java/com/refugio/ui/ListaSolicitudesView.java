@@ -2,6 +2,7 @@ package com.refugio.ui;
 
 import com.refugio.modelo.SolicitudAdopcion;
 import com.refugio.repositorios.SolicitudAdopcionRepository;
+import com.refugio.repositorios.MascotaRepository;
 import com.refugio.servicios.UsuarioSesion;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -30,10 +31,12 @@ import java.util.List;
 public class ListaSolicitudesView extends VerticalLayout implements BeforeEnterObserver {
     
     private final SolicitudAdopcionRepository solicitudAdopcionRepository;
+    private final MascotaRepository mascotaRepository;
 
     @Autowired
-    public ListaSolicitudesView(SolicitudAdopcionRepository solicitudAdopcionRepository) {
+    public ListaSolicitudesView(SolicitudAdopcionRepository solicitudAdopcionRepository, MascotaRepository mascotaRepository) {
         this.solicitudAdopcionRepository = solicitudAdopcionRepository;
+        this.mascotaRepository = mascotaRepository;
         
         setWidthFull();
         setPadding(true);
@@ -227,6 +230,16 @@ public class ListaSolicitudesView extends VerticalLayout implements BeforeEnterO
         try {
             solicitud.setEstadoTramite(estado);
             solicitudAdopcionRepository.save(solicitud);
+
+            // Si la solicitud fue aprobada, actualizar el estado de la mascota a 'ADOPTADA'
+            if ("APROBADA".equalsIgnoreCase(estado) && solicitud.getMascota() != null) {
+                try {
+                    solicitud.getMascota().actualizarEstado("ADOPTADA");
+                    mascotaRepository.save(solicitud.getMascota());
+                } catch (Exception ignore) {
+                    // Si falla actualizar mascota, no impedir el flujo principal
+                }
+            }
 
             String mensaje = estado.equals("APROBADA") ? "Solicitud Aceptada" : "Solicitud Rechazada";
             NotificationVariant variante = estado.equals("APROBADA") ? 

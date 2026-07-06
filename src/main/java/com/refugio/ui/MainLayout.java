@@ -29,10 +29,11 @@ public class MainLayout extends AppLayout {
         header.setWidthFull();
         header.setPadding(true);
         header.setSpacing(true);
+        header.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
 
         // Determinar color del header según rol
         if (UsuarioSesion.esAdmin()) {
-            header.getStyle().set("background-color", "#460bc9");
+            header.getStyle().set("background-color", "#342d57");
         } else {
             header.addClassNames(LumoUtility.Background.PRIMARY);
         }
@@ -40,21 +41,24 @@ public class MainLayout extends AppLayout {
 
         DrawerToggle toggle = new DrawerToggle();
         toggle.setAriaLabel("Menu toggle");
+        toggle.getStyle().set("color", "#FFFFFF");
 
         H1 titulo = new H1("Floof - Panel de Administración");
         titulo.getStyle().set("margin", "0");
         titulo.getStyle().set("color", "#FFFFFF");
         titulo.addClassNames(LumoUtility.FontSize.LARGE);
 
-        HorizontalLayout espaciador = new HorizontalLayout();
-        espaciador.setFlexGrow(1);
-
         Button btnCerrarSesion = new Button("Cerrar Sesión", new Icon(VaadinIcon.SIGN_OUT));
         btnCerrarSesion.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
         btnCerrarSesion.getStyle().set("color", "#FFFFFF");
         btnCerrarSesion.addClickListener(event -> cerrarSesion());
 
-        header.add(toggle, titulo, espaciador, btnCerrarSesion);
+        HorizontalLayout bloqueIzquierdo = new HorizontalLayout(toggle, titulo);
+        bloqueIzquierdo.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+        bloqueIzquierdo.setSpacing(true);
+        bloqueIzquierdo.setPadding(false);
+
+        header.add(bloqueIzquierdo, btnCerrarSesion);
         addToNavbar(header);
     }
 

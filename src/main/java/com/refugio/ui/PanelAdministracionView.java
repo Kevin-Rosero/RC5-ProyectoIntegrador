@@ -26,6 +26,10 @@ public class PanelAdministracionView extends VerticalLayout implements BeforeEnt
         setSpacing(true);
         setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.START);
 
+        getStyle()
+                .set("background-color", "#f6f4fb")
+                .set("min-height", "100vh");
+
         add(new H2("Panel de administración"));
         add(new Paragraph("Gestiona adoptantes, mascotas y valida solicitudes de adopción."));
         add(crearSeccionFunciones());
@@ -35,7 +39,10 @@ public class PanelAdministracionView extends VerticalLayout implements BeforeEnt
         VerticalLayout seccion = new VerticalLayout();
         seccion.setSpacing(true);
         seccion.setPadding(true);
-        seccion.addClassNames(LumoUtility.Background.BASE, LumoUtility.BorderRadius.MEDIUM, LumoUtility.Border.ALL);
+        seccion.getStyle()
+                .set("background-color", "#ffffff")
+                .set("border", "1px solid #d8d2ea")
+                .set("border-radius", "12px");
 
         H3 titulo = new H3("Funciones de Administración");
         titulo.addClassNames(LumoUtility.Margin.Top.NONE);
@@ -44,20 +51,33 @@ public class PanelAdministracionView extends VerticalLayout implements BeforeEnt
         HorizontalLayout fila = new HorizontalLayout();
         fila.setSpacing(true);
         fila.setWidthFull();
+        fila.getStyle().set("flex-wrap", "wrap");
 
         Button btnAdoptantes = new Button("Gestionar Adoptantes", VaadinIcon.USERS.create());
         btnAdoptantes.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnAdoptantes.setWidth("220px");
+        btnAdoptantes.getStyle()
+                .set("background-color", "#342d57")
+                .set("color", "#ffffff")
+                .set("border-radius", "10px");
         btnAdoptantes.addClickListener(event -> getUI().ifPresent(ui -> ui.navigate("adoptantes")));
 
         Button btnSolicitudes = new Button("Validar Solicitudes", VaadinIcon.ENVELOPE_OPEN.create());
-        btnSolicitudes.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
+        btnSolicitudes.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_TERTIARY);
         btnSolicitudes.setWidth("220px");
+        btnSolicitudes.getStyle()
+                .set("background-color", "#4f4a79")
+                .set("color", "#ffffff")
+                .set("border-radius", "10px");
         btnSolicitudes.addClickListener(event -> getUI().ifPresent(ui -> ui.navigate("solicitudes")));
 
         Button btnMascotas = new Button("Catálogo de Mascotas", VaadinIcon.SEARCH.create());
         btnMascotas.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         btnMascotas.setWidth("220px");
+        btnMascotas.getStyle()
+                .set("color", "#342d57")
+                .set("border", "1px solid #342d57")
+                .set("border-radius", "10px");
         btnMascotas.addClickListener(event -> getUI().ifPresent(ui -> ui.navigate("mascotas")));
 
         fila.add(btnAdoptantes, btnSolicitudes, btnMascotas);

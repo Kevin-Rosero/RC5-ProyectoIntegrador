@@ -3,9 +3,13 @@ package com.refugio.ui;
 import com.refugio.modelo.Adoptante;
 import com.refugio.repositorios.AdoptanteRepository;
 import com.refugio.servicios.UsuarioSesion;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -34,10 +38,7 @@ public class ListaAdoptantesView extends VerticalLayout implements BeforeEnterOb
         setSpacing(true);
         addClassNames(LumoUtility.Padding.MEDIUM);
 
-        H2 titulo = new H2("Gestión de Adoptantes");
-        titulo.addClassNames(LumoUtility.Margin.NONE);
-
-        add(titulo);
+        add(crearTitulo());
         cargarAdoptantes();
     }
 
@@ -84,11 +85,54 @@ public class ListaAdoptantesView extends VerticalLayout implements BeforeEnterOb
                     .setHeader("Edad")
                     .setWidth("80px");
 
+            grid.addComponentColumn(adoptante -> {
+                        Button btnEliminar = new Button("Eliminar", new Icon(VaadinIcon.TRASH));
+                        btnEliminar.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
+                        btnEliminar.addClickListener(event -> eliminarAdoptante(adoptante));
+                        return btnEliminar;
+                    })
+                    .setHeader("Eliminar")
+                    .setAutoWidth(true)
+                    .setFlexGrow(0);
+
             grid.setItems(adoptantes);
             add(grid);
         } catch (Exception e) {
             Notification notification = Notification.show("Error al cargar adoptantes: " + e.getMessage());
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         }
+    }
+
+    private void eliminarAdoptante(Adoptante adoptante) {
+        try {
+            if (adoptante.getId() == null) {
+                Notification notification = Notification.show("No se puede eliminar el adoptante seleccionado.");
+                notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                return;
+            }
+
+            adoptanteRepository.deleteById(adoptante.getId());
+
+            Notification notification = Notification.show("Adoptante eliminado correctamente.");
+            notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            notification.setDuration(3000);
+
+            refrescarVista();
+        } catch (Exception e) {
+            Notification notification = Notification.show("Error al eliminar adoptante: " + e.getMessage());
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+        }
+    }
+
+    private void refrescarVista() {
+        removeAll();
+        add(crearTitulo());
+        cargarAdoptantes();
+    }
+
+    private H2 crearTitulo() {
+        H2 titulo = new H2("Gestión de Adoptantes");
+        titulo.addClassNames(LumoUtility.Margin.NONE);
+        return titulo;
     }
 }
